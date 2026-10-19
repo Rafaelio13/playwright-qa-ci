@@ -21,7 +21,7 @@ test.describe('Favorites', () => {
     const existing = api.rows(await existingRes.json());
     const favorited = new Set(existing.map((row) => row.product_id));
 
-    const catalog = await api.products(request);
+    const catalog = await api.allProductsByQuery(request);
     const candidate = api.firstMatching(
       catalog,
       (item) => item.in_stock === true && !item.is_rental && !favorited.has(item.id),

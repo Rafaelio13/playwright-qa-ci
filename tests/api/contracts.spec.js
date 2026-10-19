@@ -14,7 +14,8 @@ test.describe('API contracts', () => {
     expect(response.ok()).toBeTruthy();
     const body = await response.json();
     expect(body.email).toBe(customer.email);
-    expect(body.role ?? 'user').not.toBe('admin');
+    expect(body.first_name).toBe('Jane');
+    expect(body.last_name).toBe('Doe');
   });
 
   test('product detail matches the list payload', async ({ request, inStockProduct }) => {
@@ -40,13 +41,17 @@ test.describe('API contracts', () => {
     expect(children).toEqual(expect.arrayContaining(['Hammer', 'Pliers']));
   });
 
-  test('related products share the same category as the source product', async ({
+  test('related products are other items in the same category', async ({
     request,
     inStockProduct,
   }) => {
     const related = api.rows(await api.relatedProducts(request, inStockProduct.id));
     expect(related.length).toBeGreaterThan(0);
     expect(related.every((item) => item.id !== inStockProduct.id)).toBeTruthy();
+
+    const sample = await api.productById(request, related[0].id);
+    expect(sample.category?.id, 'related product has no category').toBeTruthy();
+    expect(sample.category.id).toBe(inStockProduct.category.id);
   });
 
   test('POST /payment/check accepts cash-on-delivery @smoke', async ({ request }) => {

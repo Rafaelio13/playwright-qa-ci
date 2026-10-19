@@ -21,8 +21,8 @@ test.describe('Contact', () => {
   test('message shorter than 50 characters is rejected', async ({ page }) => {
     const contact = contactPage(page);
     await open(page, '/contact');
-    await contact.firstName.fill('Ely');
-    await contact.lastName.fill('Cerna');
+    await contact.firstName.fill('Pat');
+    await contact.lastName.fill('Tester');
     await contact.email.fill('customer@practicesoftwaretesting.com');
     await contact.subject.selectOption('customer-service');
     await contact.message.fill('too short');
@@ -37,8 +37,8 @@ test.describe('Contact', () => {
     const contact = contactPage(page);
     const stamp = Date.now();
     await open(page, '/contact');
-    await contact.firstName.fill('Ely');
-    await contact.lastName.fill('Cerna');
+    await contact.firstName.fill('Pat');
+    await contact.lastName.fill('Tester');
     await contact.email.fill('customer@practicesoftwaretesting.com');
     await contact.subject.selectOption('webmaster');
     await contact.message.fill(

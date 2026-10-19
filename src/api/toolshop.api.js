@@ -141,7 +141,7 @@ function rows(list) {
 
 function firstMatching(list, predicate) {
   const match = rows(list).find(predicate);
-  expect(match, 'expected at least one matching product').toBeTruthy();
+  expect(match, 'expected at least one matching record').toBeTruthy();
   return match;
 }
 
