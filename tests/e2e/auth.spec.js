@@ -1,6 +1,7 @@
 const { test, expect, customer } = require('../../src/fixtures');
 const { open } = require('../../src/app/navigation');
 const { loginPage } = require('../../src/pages/login.page');
+const { registerPage } = require('../../src/pages/register.page');
 
 test.describe('Authentication', () => {
   test('customer can sign in from the UI @smoke', async ({ page }) => {
@@ -32,5 +33,18 @@ test.describe('Authentication', () => {
 
     await expect(login.error).toBeVisible();
     await expect(page).toHaveURL(/\/auth\/login/);
+  });
+
+  test('empty register form stays on the page and shows required errors @smoke', async ({
+    page,
+  }) => {
+    const register = registerPage(page);
+    await open(page, '/auth/register');
+    await expect(register.form).toBeVisible();
+    await register.submit.click();
+
+    await expect(register.firstNameError).toBeVisible();
+    await expect(register.lastNameError).toBeVisible();
+    await expect(page).toHaveURL(/\/auth\/register/);
   });
 });

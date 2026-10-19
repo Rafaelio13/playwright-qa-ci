@@ -1,6 +1,14 @@
 function checkoutPage(page) {
   return {
     addToCart: page.getByTestId('add-to-cart'),
+    quantity: page.getByTestId('quantity'),
+    increaseQuantity: page.getByTestId('increase-quantity'),
+    decreaseQuantity: page.getByTestId('decrease-quantity'),
+    cartQuantity: page.getByTestId('cart-quantity'),
+    productQuantity: page.getByTestId('product-quantity'),
+    productPrice: page.getByTestId('product-price'),
+    linePrice: page.getByTestId('line-price'),
+    cartTotal: page.getByTestId('cart-total'),
     navCart: page.getByTestId('nav-cart'),
     productTitle: page.getByTestId('product-title'),
     proceedCart: page.getByTestId('proceed-1'),

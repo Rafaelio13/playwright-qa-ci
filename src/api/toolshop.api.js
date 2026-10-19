@@ -52,9 +52,95 @@ async function invoices(request, token) {
   return response.json();
 }
 
+async function brands(request) {
+  const response = await request.get(`${apiUrl}/brands`, {
+    headers: { Accept: 'application/json' },
+  });
+  expect(response.ok(), `brands ${response.status()}`).toBeTruthy();
+  return response.json();
+}
+
+async function categories(request) {
+  const response = await request.get(`${apiUrl}/categories`, {
+    headers: { Accept: 'application/json' },
+  });
+  expect(response.ok(), `categories ${response.status()}`).toBeTruthy();
+  return response.json();
+}
+
+async function categoriesTree(request) {
+  const response = await request.get(`${apiUrl}/categories/tree`, {
+    headers: { Accept: 'application/json' },
+  });
+  expect(response.ok(), `categories/tree ${response.status()}`).toBeTruthy();
+  return response.json();
+}
+
+async function productsByQuery(request, params) {
+  const query = new URLSearchParams(params).toString();
+  const response = await request.get(`${apiUrl}/products?${query}`, {
+    headers: { Accept: 'application/json' },
+  });
+  expect(response.ok(), `products?${query} ${response.status()}`).toBeTruthy();
+  return response.json();
+}
+
+async function allProductsByQuery(request, params = {}) {
+  const first = await productsByQuery(request, { ...params, page: '1' });
+  const collected = [...rows(first)];
+  const lastPage = first.last_page || 1;
+  for (let page = 2; page <= lastPage; page += 1) {
+    const next = await productsByQuery(request, { ...params, page: String(page) });
+    collected.push(...rows(next));
+  }
+  return collected;
+}
+
+async function relatedProducts(request, productId) {
+  const response = await request.get(`${apiUrl}/products/${productId}/related`, {
+    headers: { Accept: 'application/json' },
+  });
+  expect(response.ok(), `related ${productId} ${response.status()}`).toBeTruthy();
+  return response.json();
+}
+
+async function favorites(request, token) {
+  return request.get(`${apiUrl}/favorites`, { headers: authHeaders(token) });
+}
+
+async function addFavorite(request, token, productId) {
+  return request.post(`${apiUrl}/favorites`, {
+    headers: { ...authHeaders(token), 'Content-Type': 'application/json' },
+    data: { product_id: productId },
+  });
+}
+
+async function deleteFavorite(request, token, favoriteId) {
+  return request.delete(`${apiUrl}/favorites/${favoriteId}`, {
+    headers: authHeaders(token),
+  });
+}
+
+async function paymentCheck(request, method) {
+  return request.post(`${apiUrl}/payment/check`, {
+    headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+    data: { method },
+  });
+}
+
+async function register(request, data = {}) {
+  return request.post(`${apiUrl}/users/register`, {
+    headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+    data,
+  });
+}
+
+function rows(list) {
+  return Array.isArray(list) ? list : list.data || [];
+}
+
 function firstMatching(list, predicate) {
-  const rows = Array.isArray(list) ? list : list.data || [];
-  const match = rows.find(predicate);
+  const match = rows(list).find(predicate);
   expect(match, 'expected at least one matching product').toBeTruthy();
   return match;
 }
@@ -67,5 +153,17 @@ module.exports = {
   products,
   productById,
   invoices,
+  brands,
+  categories,
+  categoriesTree,
+  productsByQuery,
+  allProductsByQuery,
+  relatedProducts,
+  favorites,
+  addFavorite,
+  deleteFavorite,
+  paymentCheck,
+  register,
+  rows,
   firstMatching,
 };

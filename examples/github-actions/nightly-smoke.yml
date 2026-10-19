@@ -1,0 +1,39 @@
+# EXAMPLE ONLY — GitHub does not run files in this folder.
+# Copy to .github/workflows/nightly-smoke.yml when you want the daily job.
+#
+# This workflow is intentionally kept out of .github/workflows/ so a
+# schedule trigger cannot fire until you opt in.
+
+name: Nightly smoke (example)
+
+on:
+  schedule:
+    - cron: '0 3 * * *' # every day at 03:00 UTC
+  workflow_dispatch:
+
+concurrency:
+  group: playwright-nightly-smoke
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    name: Smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:smoke
+        env:
+          CI: true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report-nightly-smoke
+          path: playwright-report/
+          retention-days: 7

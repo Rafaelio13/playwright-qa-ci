@@ -1,0 +1,39 @@
+# EXAMPLE ONLY — GitHub does not run files in this folder.
+# Copy to .github/workflows/daily-regression.yml when you want the daily job.
+#
+# This workflow is intentionally kept out of .github/workflows/ so a
+# schedule trigger cannot fire until you opt in.
+
+name: Daily regression (example)
+
+on:
+  schedule:
+    - cron: '0 6 * * *' # every day at 06:00 UTC
+  workflow_dispatch:
+
+concurrency:
+  group: playwright-daily-regression
+  cancel-in-progress: true
+
+jobs:
+  regression:
+    name: Full suite
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm test
+        env:
+          CI: true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report-daily
+          path: playwright-report/
+          retention-days: 14

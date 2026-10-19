@@ -1,3 +1,5 @@
+# Live CI: PRs run smoke, main runs the full suite.
+# Daily cron examples live in examples/github-actions/ and are not executed.
 name: Playwright CI
 
 on:
