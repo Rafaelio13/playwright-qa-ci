@@ -1,5 +1,5 @@
 const { test, expect, api } = require('../../src/fixtures');
-const { open, openProduct } = require('../../src/app/navigation');
+const { openProduct } = require('../../src/app/navigation');
 const { productPage } = require('../../src/pages/product.page');
 const { accountPage } = require('../../src/pages/account.page');
 

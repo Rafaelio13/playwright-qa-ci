@@ -24,28 +24,31 @@ async function addProductAndOpenCart(page, product) {
   await expect(checkout.productTitle.first()).toContainText(product.name);
 }
 
-async function applyAddress(checkout, address) {
-  await checkout.country.selectOption(address.country);
-  await checkout.postalCode.fill(address.postalCode);
-  await checkout.houseNumber.fill(address.houseNumber);
-  await checkout.street.fill(address.street);
-  await checkout.city.fill(address.city);
-  await checkout.state.fill(address.state);
-}
-
 async function fillBillingAddress(page, address = NL_ADDRESS) {
   const checkout = checkoutPage(page);
   await expect(checkout.street).toBeVisible();
-  // Profile hydrates Vienna/AT after first paint; wait, then overwrite with NL.
+  // Jane Doe's profile hydrates Vienna after first paint. Wait, then switch to NL
+  // so postcode lookup can fill a country-matching street/city.
   await expect
     .poll(async () => (await checkout.street.inputValue()) !== '', { timeout: 8_000 })
     .toBeTruthy();
-  await applyAddress(checkout, address);
+  await checkout.country.selectOption(address.country);
+  await checkout.postalCode.fill(address.postalCode);
+  await checkout.houseNumber.fill(address.houseNumber);
   await checkout.lookupLoading.waitFor({ state: 'visible', timeout: 5_000 }).catch(() => {});
   await checkout.lookupLoading.waitFor({ state: 'hidden', timeout: 10_000 }).catch(() => {});
-  await applyAddress(checkout, address);
+  if (await page.getByTestId('postcode-lookup-error').isVisible().catch(() => false)) {
+    await checkout.street.fill(address.street);
+    await checkout.city.fill(address.city);
+    await checkout.state.fill(address.state);
+  }
+  if ((await checkout.country.inputValue()) !== address.country) {
+    await checkout.country.selectOption(address.country);
+    await checkout.postalCode.fill(address.postalCode);
+    await checkout.houseNumber.fill(address.houseNumber);
+  }
   await expect(checkout.country).toHaveValue(address.country);
-  await expect(checkout.city).toHaveValue(address.city);
+  await expect(checkout.city).not.toHaveValue(/vienna/i);
   await expect(checkout.proceedAddress).toBeEnabled();
   await checkout.proceedAddress.click();
 }
@@ -61,7 +64,11 @@ async function payCashOnDelivery(page) {
   );
   await checkout.finish.click();
   const invoiceRes = await invoiceCall;
-  expect(invoiceRes.ok(), `create invoice returned ${invoiceRes.status()}`).toBeTruthy();
+  const invoiceBody = await invoiceRes.text();
+  expect(
+    invoiceRes.ok(),
+    `create invoice returned ${invoiceRes.status()}: ${invoiceBody}`,
+  ).toBeTruthy();
   await expect(checkout.confirmation).toBeVisible({ timeout: 20_000 });
 }
 

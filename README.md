@@ -35,7 +35,7 @@ Specs stay short. If a test needs twenty clicks, that belongs in `src/flows/`.
 | --- | --- |
 | `tests/e2e/auth.spec.js` | UI login · bad password · empty register stays invalid |
 | `tests/e2e/catalog.spec.js` | Search vs API · out-of-stock · sort A–Z · Hammer category · brand filter · empty search · Hand Tools nav · related products · compare bar |
-| `tests/e2e/cart.spec.js` | Empty cart copy · qty 2 updates badge and line total |
+| `tests/e2e/cart.spec.js` | Empty cart hides header badge · qty 2 updates badge and line total |
 | `tests/e2e/checkout.spec.js` | Cart → cash on delivery → **invoice on the API** |
 | `tests/e2e/contact.spec.js` | Required fields · 50-character message · confirmation after POST `/messages` |
 | `tests/e2e/favorites.spec.js` | Guest is unauthorized · customer add / list / delete |
