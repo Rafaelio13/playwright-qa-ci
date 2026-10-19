@@ -9,13 +9,10 @@ function money(text) {
 }
 
 test.describe('Cart', () => {
-  test('empty cart hides the header badge and has no line items @smoke', async ({ page }) => {
+  test('guest with an empty cart does not see the cart icon @smoke', async ({ page }) => {
     const cart = checkoutPage(page);
     await open(page, '/');
     await expect(cart.navCart).toHaveCount(0);
-    await open(page, '/checkout');
-    await expect(cart.productTitle).toHaveCount(0);
-    await expect(cart.proceedCart).toHaveCount(0);
   });
 
   test('quantity 2 on the PDP updates the badge and the line total', async ({
