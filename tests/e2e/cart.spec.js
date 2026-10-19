@@ -9,9 +9,13 @@ function money(text) {
 }
 
 test.describe('Cart', () => {
-  test('empty cart explains there is nothing to display @smoke', async ({ page }) => {
-    await open(page, '/checkout');
-    await expect(page.getByText(/the cart is empty/i)).toBeVisible();
+  test('empty cart has no line items and cannot proceed @smoke', async ({ page }) => {
+    const cart = checkoutPage(page);
+    await open(page, '/');
+    await expect(cart.cartQuantity).toHaveText('0');
+    await cart.navCart.click();
+    await expect(cart.productTitle).toHaveCount(0);
+    await expect(cart.proceedCart).toHaveCount(0);
   });
 
   test('quantity 2 on the PDP updates the badge and the line total', async ({

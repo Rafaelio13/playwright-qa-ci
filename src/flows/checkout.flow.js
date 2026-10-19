@@ -24,17 +24,28 @@ async function addProductAndOpenCart(page, product) {
   await expect(checkout.productTitle.first()).toContainText(product.name);
 }
 
-async function fillBillingAddress(page, address = NL_ADDRESS) {
-  const checkout = checkoutPage(page);
-  await expect(checkout.street).toBeVisible();
+async function applyAddress(checkout, address) {
   await checkout.country.selectOption(address.country);
   await checkout.postalCode.fill(address.postalCode);
   await checkout.houseNumber.fill(address.houseNumber);
+  await checkout.street.fill(address.street);
+  await checkout.city.fill(address.city);
+  await checkout.state.fill(address.state);
+}
+
+async function fillBillingAddress(page, address = NL_ADDRESS) {
+  const checkout = checkoutPage(page);
+  await expect(checkout.street).toBeVisible();
+  // Profile hydrates Vienna/AT after first paint; wait, then overwrite with NL.
+  await expect
+    .poll(async () => (await checkout.street.inputValue()) !== '', { timeout: 8_000 })
+    .toBeTruthy();
+  await applyAddress(checkout, address);
   await checkout.lookupLoading.waitFor({ state: 'visible', timeout: 5_000 }).catch(() => {});
   await checkout.lookupLoading.waitFor({ state: 'hidden', timeout: 10_000 }).catch(() => {});
-  if (!(await checkout.street.inputValue())) await checkout.street.fill(address.street);
-  if (!(await checkout.city.inputValue())) await checkout.city.fill(address.city);
-  if (!(await checkout.state.inputValue())) await checkout.state.fill(address.state);
+  await applyAddress(checkout, address);
+  await expect(checkout.country).toHaveValue(address.country);
+  await expect(checkout.city).toHaveValue(address.city);
   await expect(checkout.proceedAddress).toBeEnabled();
   await checkout.proceedAddress.click();
 }

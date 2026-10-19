@@ -30,30 +30,38 @@ test.describe('Favorites', () => {
     const pdp = productPage(asCustomer);
     await openProduct(asCustomer, candidate);
 
-    const [createRes] = await Promise.all([
-      asCustomer.waitForResponse(
-        (res) => res.url().includes('/favorites') && res.request().method() === 'POST',
-      ),
-      pdp.addToFavorites.click(),
-    ]);
-    expect(createRes.status(), `add favorite returned ${createRes.status()}`).toBe(201);
-    await expect(asCustomer.getByText(/product added to your favorites list/i)).toBeVisible();
+    try {
+      const [createRes] = await Promise.all([
+        asCustomer.waitForResponse(
+          (res) => res.url().includes('/favorites') && res.request().method() === 'POST',
+        ),
+        pdp.addToFavorites.click(),
+      ]);
+      expect(createRes.status(), `add favorite returned ${createRes.status()}`).toBe(201);
+      await expect(asCustomer.getByText(/product added to your favorites list/i)).toBeVisible();
 
-    const listed = await api.favorites(request, customerToken);
-    const afterAdd = api.rows(await listed.json());
-    const created = afterAdd.find((row) => row.product_id === candidate.id);
-    expect(created, 'API favorites did not include the product just starred').toBeTruthy();
+      const listed = await api.favorites(request, customerToken);
+      const afterAdd = api.rows(await listed.json());
+      const created = afterAdd.find((row) => row.product_id === candidate.id);
+      expect(created, 'API favorites did not include the product just starred').toBeTruthy();
 
-    const account = accountPage(asCustomer);
-    await open(asCustomer, '/account/favorites');
-    await expect(account.pageTitle).toHaveText(/favorites/i);
-    const card = account.favoriteCard(candidate.name);
-    await expect(card).toBeVisible();
+      const account = accountPage(asCustomer);
+      await account.navMenu.click();
+      await account.navFavorites.click();
+      await expect(account.pageTitle).toHaveText(/favorites/i);
+      const card = account.favoriteCard(candidate.name);
+      await expect(card).toBeVisible();
 
-    await card.getByTestId('delete').click();
-    await expect(card).toHaveCount(0);
-
-    const afterDelete = api.rows(await (await api.favorites(request, customerToken)).json());
-    expect(afterDelete.some((row) => row.product_id === candidate.id)).toBeFalsy();
+      await card.getByTestId('delete').click();
+      await expect(card).toHaveCount(0);
+    } finally {
+      const leftoverRes = await api.favorites(request, customerToken);
+      const leftover = api
+        .rows(await leftoverRes.json())
+        .find((row) => row.product_id === candidate.id);
+      if (leftover?.id) {
+        await api.deleteFavorite(request, customerToken, leftover.id);
+      }
+    }
   });
 });
