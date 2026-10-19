@@ -1,19 +1,21 @@
-const { test, expect, api } = require('../lib/fixtures');
-const { open, openProduct } = require('../lib/app');
+const { test, expect, api } = require('../../src/fixtures');
+const { open, openProduct } = require('../../src/app/navigation');
+const { catalogPage } = require('../../src/pages/catalog.page');
 
 test.describe('Catalog', () => {
   test('search results match the products API @smoke', async ({ page, request }) => {
     const query = 'Hammer';
     const catalog = await api.products(request, query);
     const names = (catalog.data || catalog).map((item) => item.name);
+    const ui = catalogPage(page);
 
     await open(page, '/');
-    await page.getByTestId('search-query').fill(query);
-    await page.getByTestId('search-submit').click();
+    await ui.searchQuery.fill(query);
+    await ui.searchSubmit.click();
 
-    await expect(page.getByTestId('search-term')).toHaveText(query);
-    await expect(page.getByTestId('search-result-count')).toContainText(/hammer/i);
-    await expect(page.getByTestId('product-name').filter({ hasText: /hammer/i }).first()).toBeVisible();
+    await expect(ui.searchTerm).toHaveText(query);
+    await expect(ui.searchResultCount).toContainText(/hammer/i);
+    await expect(ui.productNames.filter({ hasText: /hammer/i }).first()).toBeVisible();
     expect(
       names.some((name) => /hammer/i.test(name)),
       'API search for Hammer returned no hammers',

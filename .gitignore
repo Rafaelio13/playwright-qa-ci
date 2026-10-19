@@ -3,7 +3,11 @@ test-results/
 playwright-report/
 blob-report/
 playwright/.cache/
-.env
 .auth/
 *.log
 .DS_Store
+
+# Secrets and local overrides — never commit these
+.env
+.env.*
+!.env.example

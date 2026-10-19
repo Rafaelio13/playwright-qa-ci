@@ -1,4 +1,6 @@
+require('dotenv').config();
 const { defineConfig, devices } = require('@playwright/test');
+const { baseUrl } = require('./src/config/env');
 
 const isCI = !!process.env.CI;
 
@@ -14,7 +16,7 @@ module.exports = defineConfig({
   timeout: 60_000,
   expect: { timeout: 10_000 },
   use: {
-    baseURL: process.env.BASE_URL || 'https://practicesoftwaretesting.com',
+    baseURL: baseUrl,
     testIdAttribute: 'data-test',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',

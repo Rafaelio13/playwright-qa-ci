@@ -1,8 +1,11 @@
+require('dotenv').config();
+
 /**
- * Public demo accounts published by Testsmith for Toolshop.
- * Not secrets. Do not point this repo at a real product.
+ * Runtime config. Defaults are the public Toolshop demo.
+ * Override with a local .env (see .env.example). Never commit .env.
  */
 module.exports = {
+  baseUrl: process.env.BASE_URL || 'https://practicesoftwaretesting.com',
   apiUrl: process.env.API_URL || 'https://api.practicesoftwaretesting.com',
   customer: {
     email: process.env.CUSTOMER_EMAIL || 'customer@practicesoftwaretesting.com',

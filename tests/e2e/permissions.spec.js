@@ -1,5 +1,5 @@
-const { test, expect } = require('../lib/fixtures');
-const { open } = require('../lib/app');
+const { test, expect } = require('../../src/fixtures');
+const { open } = require('../../src/app/navigation');
 
 test.describe('Permissions', () => {
   test('customer is sent to login instead of the admin dashboard', async ({ asCustomer }) => {

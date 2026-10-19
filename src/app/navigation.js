@@ -1,8 +1,7 @@
 const { expect } = require('@playwright/test');
 
 /**
- * Small helpers. No 400-line page objects.
- * The app keeps an open connection, so never wait for networkidle.
+ * Toolshop keeps an open connection, so never wait for networkidle.
  */
 async function waitForApp(page) {
   const chrome = page.getByTestId('nav-home');
@@ -26,17 +25,12 @@ async function injectAuthToken(page, token) {
 
 async function openProduct(page, product) {
   await open(page, `/product/${product.id}`);
-  await expectLoadedProduct(page, product.name);
-}
-
-async function expectLoadedProduct(page, name) {
-  await expect(page.getByTestId('product-name')).toContainText(name);
+  await expect(page.getByTestId('product-name')).toContainText(product.name);
 }
 
 module.exports = {
-  open,
   waitForApp,
+  open,
   injectAuthToken,
   openProduct,
-  expectLoadedProduct,
 };

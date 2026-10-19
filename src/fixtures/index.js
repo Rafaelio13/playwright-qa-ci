@@ -1,7 +1,7 @@
 const { test: base, expect } = require('@playwright/test');
-const api = require('./api');
-const { customer, admin } = require('./env');
-const { injectAuthToken } = require('./app');
+const api = require('../api/toolshop.api');
+const { customer, admin } = require('../config/env');
+const { injectAuthToken } = require('../app/navigation');
 
 const test = base.extend({
   customerToken: async ({ request }, use) => {

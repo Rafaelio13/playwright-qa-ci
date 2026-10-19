@@ -1,4 +1,4 @@
-const { test, expect, api, customer } = require('../lib/fixtures');
+const { test, expect, api, customer } = require('../../src/fixtures');
 
 test.describe('API contracts', () => {
   test('login rejects a bad password @smoke', async ({ request }) => {

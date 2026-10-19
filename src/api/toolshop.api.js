@@ -1,5 +1,12 @@
 const { expect } = require('@playwright/test');
-const { apiUrl } = require('./env');
+const { apiUrl } = require('../config/env');
+
+function authHeaders(token) {
+  return {
+    Authorization: `Bearer ${token}`,
+    Accept: 'application/json',
+  };
+}
 
 async function login(request, email, password) {
   return request.post(`${apiUrl}/users/login`, {
@@ -16,15 +23,8 @@ async function loginToken(request, email, password) {
   return body.access_token;
 }
 
-async function authHeaders(token) {
-  return {
-    Authorization: `Bearer ${token}`,
-    Accept: 'application/json',
-  };
-}
-
 async function me(request, token) {
-  return request.get(`${apiUrl}/users/me`, { headers: await authHeaders(token) });
+  return request.get(`${apiUrl}/users/me`, { headers: authHeaders(token) });
 }
 
 async function products(request, query = '') {
@@ -46,7 +46,7 @@ async function productById(request, id) {
 
 async function invoices(request, token) {
   const response = await request.get(`${apiUrl}/invoices`, {
-    headers: await authHeaders(token),
+    headers: authHeaders(token),
   });
   expect(response.ok(), `invoices ${response.status()}`).toBeTruthy();
   return response.json();
