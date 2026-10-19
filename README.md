@@ -97,6 +97,7 @@ Daily cron YAML (`0 6 * * *` full suite, `0 3 * * *` smoke) lives here on purpos
 
 ## Known limits
 
+- The public API is sometimes slow. HTTP helpers wait up to 30s instead of inheriting the 15s UI `actionTimeout`.
 - Cloudflare sometimes challenges a full-page `goto` (login redirect, a second navigation in the same test). Auth smoke accepts **nav-menu or the challenge**. Favorite cleanup uses in-app routing instead of another `goto`.
 - Jane Doe’s saved address is Vienna. Checkout switches to a Dutch postcode so city and country match; a Vienna + NL mix 422s the invoice.
 - Empty cart hides `nav-cart` (`items === 0`). There is no empty-state copy until a cart exists.
